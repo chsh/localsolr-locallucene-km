@@ -1,0 +1,7 @@
+
+Building:
+  * Prepare original LocalLucene R2.0 and LocalSolr R2.0 Release.
+  * Extract these to certain folders.
+  * Copy locallucene/* to locallucene/src/ folder.
+  * Copy localsolr/* to localsolr/src/ folder.
+  * Run ant command.
