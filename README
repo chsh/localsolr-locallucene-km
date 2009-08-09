@@ -1,0 +1,58 @@
+Name:
+localsolr-locallucene-km.
+
+Author: CHIKURA Shinsaku <scene.sc@gmail.com>
+Based on: http://sourceforge.net/projects/locallucene/
+
+Description:
+Modified version of LocalSolr/LocalLucene add support for treating distance as km(kilometers).
+
+Features:
+  * Add support for treating distance as KM(Kilometers). (Mile support removed.)
+  * Fix query parameter name definition.
+
+Usage:
+  * Copy lib/*.jar files to solr/lib directory.
+  * Add some text described below:
+    Almost same as http://www.gissearch.com/localsolr
+
+solr/conf/solrconfig.xml:
+  <updateRequestProcessorChain>
+      <processor class="com.pjaol.search.solr.update.LocalUpdateProcessorFactory">
+        <str name="latField">lat</str><!-- (1) -->
+        <str name="lngField">lng</str><!-- (2) -->
+        <int name="startTier">9</int>
+        <int name="endTier">17</int>
+      </processor>
+   <processor class="solr.RunUpdateProcessorFactory" />
+   <processor class="solr.LogUpdateProcessorFactory" />
+  </updateRequestProcessorChain>
+
+<!-- local lucene request handler -->
+<searchComponent name="localsolr"     class="com.pjaol.search.solr.component.LocalSolrQueryComponent">
+    <!-- Query parameter name for Latitude/Longitude
+         You can change this. But must be same as (1) or (2). -->
+    <str name="latField">lat</str>
+    <str name="lngField">lng</str>
+    <!-- Radius query parameter. default: 'radius' -->
+    <str name="radiusField">km</str>
+
+</searchComponent>
+
+<requestHandler name="geo" class="org.apache.solr.handler.component.SearchHandler">
+    <arr name="components">
+      <str>localsolr</str>
+      <str>facet</str>
+      <str>mlt</str>
+      <str>highlight</str>
+      <str>debug</str>
+    </arr>
+</requestHandler>
+
+solr/conf/schema.xml:
+<!-- local lucene field types -->
+<field name="lat" type="sdouble" indexed="true" stored="true"/><!-- must match the latField in solrconfig.xml -->
+<field name="lng" type="sdouble" indexed="true" stored="true"/><!-- must match the lngField in solrconfig.xml -->
+<field name="geo_distance" type="sdouble"/> <!-- Optional but used for distributed searching -->
+<dynamicField name="_local*" type="sdouble" indexed="true" stored="true"/><!-- used internally by localsolr -->
+
